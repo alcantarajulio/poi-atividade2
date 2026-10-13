@@ -1,0 +1,20 @@
+{
+  "base_url": "http://localhost:8081",
+  "target_path": "/cpu?iter=500000",
+  "vus": 16,
+  "think_time_s": 0.5,
+  "duration_s": 30,
+  "warmup_s": 5,
+  "requests": 867,
+  "rps": 28.9,
+  "error_rate": 0,
+  "latency_ms": {
+    "avg": 28.965132641291785,
+    "min": 24.898,
+    "p50": 26.605,
+    "p90": 32.36,
+    "p95": 36.1663,
+    "p99": 87.61025999999991,
+    "max": 117.049
+  }
+}

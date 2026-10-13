@@ -1,0 +1,40 @@
+ts,series,value
+1791841689,"go_gc_duration_seconds_count",12
+1791841689,"go_goroutines",7
+1791841689,"go_memstats_heap_inuse_bytes",1.478189056e+09
+1791841689,"http_request_duration_seconds_sum{method='GET',path='GET /mem'}",68.781202789
+1791841689,"http_request_duration_seconds_count{method='GET',path='GET /mem'}",93
+1791841689,"http_requests_in_flight",0
+1791841689,"http_requests_total{method='GET',path='GET /mem',status='200'}",93
+1791841689,"process_cpu_seconds_total",4.43
+1791841689,"process_resident_memory_bytes",1.02160384e+09
+1791841703,"go_gc_duration_seconds_count",6
+1791841703,"go_goroutines",43
+1791841703,"go_memstats_heap_inuse_bytes",1.075331072e+09
+1791841703,"http_request_duration_seconds_sum{method='GET',path='GET /mem'}",4.833839878
+1791841703,"http_request_duration_seconds_count{method='GET',path='GET /mem'}",21
+1791841703,"http_requests_in_flight",13
+1791841703,"http_requests_total{method='GET',path='GET /mem',status='200'}",21
+1791841703,"process_cpu_seconds_total",0.73
+1791841703,"process_resident_memory_bytes",1.019416576e+09
+1791841711,"go_gc_duration_seconds_count",6
+1791841711,"go_goroutines",49
+1791841711,"go_memstats_heap_inuse_bytes",1.07536384e+09
+1791841711,"http_request_duration_seconds_sum{method='GET',path='GET /mem'}",6.238227251
+1791841711,"http_request_duration_seconds_count{method='GET',path='GET /mem'}",26
+1791841711,"http_requests_in_flight",22
+1791841711,"http_requests_total{method='GET',path='GET /mem',status='200'}",26
+1791841711,"process_cpu_seconds_total",0.71
+1791841711,"process_resident_memory_bytes",1.072594944e+09
+1791841726,"go_gc_duration_seconds_count",0
+1791841726,"go_goroutines",6
+1791841726,"go_memstats_heap_inuse_bytes",1.35168e+06
+1791841726,"http_requests_in_flight",0
+1791841726,"process_cpu_seconds_total",0
+1791841726,"process_resident_memory_bytes",1.247232e+07
+1791841728,"go_gc_duration_seconds_count",0
+1791841728,"go_goroutines",6
+1791841728,"go_memstats_heap_inuse_bytes",1.794048e+06
+1791841728,"http_requests_in_flight",0
+1791841728,"process_cpu_seconds_total",0.01
+1791841728,"process_resident_memory_bytes",1.2603392e+07

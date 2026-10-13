@@ -1,0 +1,5 @@
+bin
+experiments/results
+analysis/.venv
+docs
+*.tar.gz

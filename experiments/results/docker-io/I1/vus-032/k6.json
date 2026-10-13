@@ -1,0 +1,20 @@
+{
+  "base_url": "http://localhost:8083",
+  "target_path": "/io?kb=256",
+  "vus": 32,
+  "think_time_s": 0.5,
+  "duration_s": 20,
+  "warmup_s": 5,
+  "requests": 1293,
+  "rps": 64.65,
+  "error_rate": 0,
+  "latency_ms": {
+    "avg": 4.984900232018566,
+    "min": 1.258,
+    "p50": 4.263,
+    "p90": 6.276000000000001,
+    "p95": 7.501399999999999,
+    "p99": 34.725999999999985,
+    "max": 41.864
+  }
+}

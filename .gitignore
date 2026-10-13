@@ -1,0 +1,9 @@
+/bin/
+*.tar.gz
+analysis/.venv/
+__pycache__/
+.DS_Store
+.vscode/
+.env
+/tools/
+experiments/results/smoke/

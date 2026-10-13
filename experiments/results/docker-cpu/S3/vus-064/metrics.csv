@@ -1,0 +1,163 @@
+ts,series,value
+1791839832,"go_gc_duration_seconds_count",10
+1791839832,"go_goroutines",6
+1791839832,"go_memstats_heap_inuse_bytes",3.497984e+06
+1791839832,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",162.67286091000005
+1791839832,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",4058
+1791839832,"http_requests_in_flight",0
+1791839832,"http_requests_total{method='GET',path='GET /cpu',status='200'}",4058
+1791839832,"process_cpu_seconds_total",118.2
+1791839832,"process_resident_memory_bytes",1.949696e+07
+1791839834,"go_gc_duration_seconds_count",11
+1791839834,"go_goroutines",90
+1791839834,"go_memstats_heap_inuse_bytes",4.071424e+06
+1791839834,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",215.70455010600006
+1791839834,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",4219
+1791839834,"http_requests_in_flight",20
+1791839834,"http_requests_total{method='GET',path='GET /cpu',status='200'}",4219
+1791839834,"process_cpu_seconds_total",122.59
+1791839834,"process_resident_memory_bytes",1.949696e+07
+1791839836,"go_gc_duration_seconds_count",11
+1791839836,"go_goroutines",91
+1791839836,"go_memstats_heap_inuse_bytes",3.407872e+06
+1791839836,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",260.75031299399996
+1791839836,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",4394
+1791839836,"http_requests_in_flight",19
+1791839836,"http_requests_total{method='GET',path='GET /cpu',status='200'}",4394
+1791839836,"process_cpu_seconds_total",127.19
+1791839836,"process_resident_memory_bytes",1.949696e+07
+1791839838,"go_gc_duration_seconds_count",11
+1791839838,"go_goroutines",81
+1791839838,"go_memstats_heap_inuse_bytes",3.956736e+06
+1791839838,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",331.3707229370001
+1791839838,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",4556
+1791839838,"http_requests_in_flight",14
+1791839838,"http_requests_total{method='GET',path='GET /cpu',status='200'}",4556
+1791839838,"process_cpu_seconds_total",131.67
+1791839838,"process_resident_memory_bytes",1.949696e+07
+1791839840,"go_gc_duration_seconds_count",12
+1791839840,"go_goroutines",93
+1791839840,"go_memstats_heap_inuse_bytes",4.251648e+06
+1791839840,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",374.97534932100035
+1791839840,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",4725
+1791839840,"http_requests_in_flight",24
+1791839840,"http_requests_total{method='GET',path='GET /cpu',status='200'}",4725
+1791839840,"process_cpu_seconds_total",136.19
+1791839840,"process_resident_memory_bytes",1.949696e+07
+1791839843,"go_gc_duration_seconds_count",12
+1791839843,"go_goroutines",86
+1791839843,"go_memstats_heap_inuse_bytes",3.473408e+06
+1791839843,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",419.91075954400065
+1791839843,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",4904
+1791839843,"http_requests_in_flight",13
+1791839843,"http_requests_total{method='GET',path='GET /cpu',status='200'}",4904
+1791839843,"process_cpu_seconds_total",140.94
+1791839843,"process_resident_memory_bytes",1.949696e+07
+1791839845,"go_gc_duration_seconds_count",12
+1791839845,"go_goroutines",79
+1791839845,"go_memstats_heap_inuse_bytes",4.169728e+06
+1791839845,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",452.460114681001
+1791839845,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",5065
+1791839845,"http_requests_in_flight",11
+1791839845,"http_requests_total{method='GET',path='GET /cpu',status='200'}",5065
+1791839845,"process_cpu_seconds_total",145.23
+1791839845,"process_resident_memory_bytes",1.949696e+07
+1791839847,"go_gc_duration_seconds_count",13
+1791839847,"go_goroutines",80
+1791839847,"go_memstats_heap_inuse_bytes",3.416064e+06
+1791839847,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",479.3886714380007
+1791839847,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",5227
+1791839847,"http_requests_in_flight",11
+1791839847,"http_requests_total{method='GET',path='GET /cpu',status='200'}",5227
+1791839847,"process_cpu_seconds_total",149.57
+1791839847,"process_resident_memory_bytes",1.9361792e+07
+1791839849,"go_gc_duration_seconds_count",13
+1791839849,"go_goroutines",78
+1791839849,"go_memstats_heap_inuse_bytes",3.457024e+06
+1791839849,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",515.9180013320002
+1791839849,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",5391
+1791839849,"http_requests_in_flight",5
+1791839849,"http_requests_total{method='GET',path='GET /cpu',status='200'}",5391
+1791839849,"process_cpu_seconds_total",153.85
+1791839849,"process_resident_memory_bytes",1.9361792e+07
+1791839852,"go_gc_duration_seconds_count",13
+1791839852,"go_goroutines",92
+1791839852,"go_memstats_heap_inuse_bytes",4.186112e+06
+1791839852,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",550.2599458579997
+1791839852,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",5555
+1791839852,"http_requests_in_flight",21
+1791839852,"http_requests_total{method='GET',path='GET /cpu',status='200'}",5555
+1791839852,"process_cpu_seconds_total",158.29
+1791839852,"process_resident_memory_bytes",1.9361792e+07
+1791839854,"go_gc_duration_seconds_count",14
+1791839854,"go_goroutines",81
+1791839854,"go_memstats_heap_inuse_bytes",3.72736e+06
+1791839854,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",587.2116466700008
+1791839854,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",5729
+1791839854,"http_requests_in_flight",10
+1791839854,"http_requests_total{method='GET',path='GET /cpu',status='200'}",5729
+1791839854,"process_cpu_seconds_total",162.75
+1791839854,"process_resident_memory_bytes",1.9492864e+07
+1791839856,"go_gc_duration_seconds_count",14
+1791839856,"go_goroutines",82
+1791839856,"go_memstats_heap_inuse_bytes",3.538944e+06
+1791839856,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",621.2003278580016
+1791839856,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",5895
+1791839856,"http_requests_in_flight",6
+1791839856,"http_requests_total{method='GET',path='GET /cpu',status='200'}",5895
+1791839856,"process_cpu_seconds_total",167.16
+1791839856,"process_resident_memory_bytes",1.9492864e+07
+1791839858,"go_gc_duration_seconds_count",14
+1791839858,"go_goroutines",83
+1791839858,"go_memstats_heap_inuse_bytes",4.235264e+06
+1791839858,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",650.0117706590013
+1791839858,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",6055
+1791839858,"http_requests_in_flight",12
+1791839858,"http_requests_total{method='GET',path='GET /cpu',status='200'}",6055
+1791839858,"process_cpu_seconds_total",171.49
+1791839858,"process_resident_memory_bytes",1.9492864e+07
+1791839860,"go_gc_duration_seconds_count",15
+1791839860,"go_goroutines",92
+1791839860,"go_memstats_heap_inuse_bytes",3.842048e+06
+1791839860,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",683.1971569170012
+1791839860,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",6224
+1791839860,"http_requests_in_flight",18
+1791839860,"http_requests_total{method='GET',path='GET /cpu',status='200'}",6224
+1791839860,"process_cpu_seconds_total",175.89
+1791839860,"process_resident_memory_bytes",1.9492864e+07
+1791839863,"go_gc_duration_seconds_count",15
+1791839863,"go_goroutines",83
+1791839863,"go_memstats_heap_inuse_bytes",3.432448e+06
+1791839863,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",717.2982950600012
+1791839863,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",6396
+1791839863,"http_requests_in_flight",14
+1791839863,"http_requests_total{method='GET',path='GET /cpu',status='200'}",6396
+1791839863,"process_cpu_seconds_total",180.4
+1791839863,"process_resident_memory_bytes",1.9492864e+07
+1791839865,"go_gc_duration_seconds_count",15
+1791839865,"go_goroutines",84
+1791839865,"go_memstats_heap_inuse_bytes",4.046848e+06
+1791839865,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",756.429064914001
+1791839865,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",6565
+1791839865,"http_requests_in_flight",14
+1791839865,"http_requests_total{method='GET',path='GET /cpu',status='200'}",6565
+1791839865,"process_cpu_seconds_total",184.84
+1791839865,"process_resident_memory_bytes",1.9492864e+07
+1791839867,"go_gc_duration_seconds_count",16
+1791839867,"go_goroutines",70
+1791839867,"go_memstats_heap_inuse_bytes",3.047424e+06
+1791839867,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",786.540283353001
+1791839867,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",6706
+1791839867,"http_requests_in_flight",0
+1791839867,"http_requests_total{method='GET',path='GET /cpu',status='200'}",6706
+1791839867,"process_cpu_seconds_total",188.46
+1791839867,"process_resident_memory_bytes",1.9492864e+07
+1791839869,"go_gc_duration_seconds_count",16
+1791839869,"go_goroutines",6
+1791839869,"go_memstats_heap_inuse_bytes",3.31776e+06
+1791839869,"http_request_duration_seconds_sum{method='GET',path='GET /cpu'}",786.540283353001
+1791839869,"http_request_duration_seconds_count{method='GET',path='GET /cpu'}",6706
+1791839869,"http_requests_in_flight",0
+1791839869,"http_requests_total{method='GET',path='GET /cpu',status='200'}",6706
+1791839869,"process_cpu_seconds_total",188.47
+1791839869,"process_resident_memory_bytes",1.9492864e+07

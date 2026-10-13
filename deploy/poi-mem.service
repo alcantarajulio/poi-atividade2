@@ -1,0 +1,14 @@
+[Unit]
+Description=POI memory-bound (alocação e varredura de buffers)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=poi
+Environment=PORT=8082
+ExecStart=/opt/poi/bin/mem
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

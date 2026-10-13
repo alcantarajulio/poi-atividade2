@@ -1,0 +1,16 @@
+[Unit]
+Description=POI IO-bound (escrita + fsync + leitura)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=poi
+Environment=PORT=8083
+StateDirectory=poi-io
+Environment=IO_DIR=/var/lib/poi-io
+ExecStart=/opt/poi/bin/io
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,22 @@
+{
+  "base_url": "http://localhost:8082",
+  "target_path": "/mem?mb=64&hold=200",
+  "vus": 4,
+  "think_time_s": 0.5,
+  "duration_s": 20,
+  "warmup_s": 5,
+  "requests": 117,
+  "requests_ok": 117,
+  "rps": 5.85,
+  "rps_ok": 5.85,
+  "error_rate": 0,
+  "latency_ms": {
+    "avg": 212.14309401709406,
+    "min": 205.852,
+    "p50": 212.071,
+    "p90": 215.6036,
+    "p95": 216.4934,
+    "p99": 219.79811999999998,
+    "max": 220.333
+  }
+}
