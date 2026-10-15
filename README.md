@@ -29,7 +29,7 @@ processo e heap do Go.
 | `experiments/` | configuração dos cenários, orquestrador e resultados brutos |
 | `analysis/analyze.py` | tabela consolidada e gráficos |
 | `lab/lab.sh` | etapas do dia no LCC |
-| `docs/` | relatório, checklist do LCC, figuras e prints |
+| `docs/` | relatório final (`relatorio.pdf`), checklist do LCC e figuras |
 
 ## Requisitos
 
