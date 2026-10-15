@@ -101,18 +101,6 @@ tabela e os gráficos:
 analysis/.venv/bin/python analysis/analyze.py experiments/results/vbox-cpu
 ```
 
-As apps de memória e de IO usam os mesmos quatro cenários, com as configurações
-`experiments/scenarios-mem.conf` e `experiments/scenarios-io.conf`. As duas
-varreduras levam cerca de 45 minutos cada e podem rodar em sequência:
-
-```bash
-experiments/run.sh experiments/scenarios-mem.conf; experiments/run.sh experiments/scenarios-io.conf
-```
-
-O `lab/lab.sh calibrate` ajusta o número de vCPUs do S4 só no
-`experiments/scenarios.conf`. Se ele mudar, a mesma linha `SCENARIOS` precisa ser
-copiada para as outras duas configurações.
-
 O `run.sh` também aceita variáveis de ambiente para rodar só uma parte da
 varredura: `ONLY="S1 S3"` escolhe os cenários, `LEVELS_ONLY="4 16"` escolhe os
 níveis, `DURATION` e `WARMUP` mudam a duração de cada nível, `RESULTS_DIR` grava em
