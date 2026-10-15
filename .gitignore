@@ -7,3 +7,4 @@ __pycache__/
 .env
 /tools/
 experiments/results/smoke/
+/run.log
