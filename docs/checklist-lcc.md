@@ -35,8 +35,11 @@ VM ainda não existe é esperado nesse momento.
 ## 1. Criar a VM (roteiro, passos 1 a 3)
 
 ```bash
-cp /local/uasc/images/ubuntu_server_2204_poi.vdi /tmp/
+ls /local/uasc/images/
+cp /local/uasc/images/ubuntu_serve_2204_poi.vdi /tmp/
 ```
+
+O roteiro escreve `ubuntu_serve_2204_poi.vdi` (sem o "r" de server). Confiram o nome real com o `ls`. O `lab.sh` aceita as duas grafias; se o VDI estiver em outra pasta, rodem os comandos com `VDI_DIR=<pasta>`.
 
 No VirtualBox, cliquem em Novo e configurem:
 
@@ -46,7 +49,7 @@ No VirtualBox, cliquem em Novo e configurem:
 | Pasta da máquina | `/tmp` |
 | Tipo e versão | Linux, Ubuntu (64-bit) |
 | Processador e memória | 1 CPU, 1024 MB |
-| Disco | usar um disco existente: `/tmp/ubuntu_server_2204_poi.vdi` |
+| Disco | usar um disco existente: `/tmp/ubuntu_serve_2204_poi.vdi` |
 
 (print de cada tela do assistente)
 
@@ -138,7 +141,7 @@ lab/lab.sh pack
 ```
 
 O `pack` gera `~/poi-resultados-<data>.tar.gz` com os resultados, o log e a
-configuração usada. Esse arquivo e o VDI (`/tmp/ubuntu_server_2204_poi.vdi`, com a
+configuração usada. Esse arquivo e o VDI (`/tmp/ubuntu_serve_2204_poi.vdi`, com a
 VM desligada) precisam ir para o Drive antes de vocês saírem, porque o `/tmp` do
 LCC é apagado. Em casa, os resultados entram no repositório e passam pelo
 `analysis/analyze.py`.
@@ -157,7 +160,7 @@ dentro dela por ssh, as três apps respondendo pelo host e as métricas em
 
 Se o VirtualBox recusar o disco dizendo que o UUID já está registrado, é porque
 outro usuário da máquina usou o mesmo VDI. Gerem um UUID novo para a cópia com
-`VBoxManage internalcommands sethduuid /tmp/ubuntu_server_2204_poi.vdi` e
+`VBoxManage internalcommands sethduuid /tmp/ubuntu_serve_2204_poi.vdi` e
 anexem de novo.
 
 Se aparecer `Host key verification failed` depois de recriar a VM, rodem

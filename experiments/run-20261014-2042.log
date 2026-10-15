@@ -1,0 +1,24 @@
+[20:42:05] configuração: experiments/scenarios.conf | backend: vbox | alvo: http://localhost:8081/cpu?iter=120000
+[20:42:05] cenário S2: 2 vCPU, 1024 MB
+[20:42:05] desligando poi-vm (ACPI)
+Waiting for VM "poi-vm" to power on...
+VM "poi-vm" has been successfully started.
+[20:42:27]   convidado confere: 2 vCPU(s), 971 MB
+[20:42:27]   aguardando 15s para o sistema estabilizar
+[20:42:43]   nível vus=1
+vus=1 reqs=130 ok/s=2.2 p50=30.8ms p95=33.1ms p99=35.9ms err=0.00%
+[20:44:02]   nível vus=2
+vus=2 reqs=244 ok/s=4.1 p50=30.8ms p95=33.6ms p99=48.2ms err=0.00%
+[20:45:21]   nível vus=4
+vus=4 reqs=458 ok/s=7.6 p50=30.6ms p95=38.4ms p99=45.8ms err=0.00%
+[20:46:41]   nível vus=8
+vus=8 reqs=922 ok/s=15.4 p50=30.2ms p95=44.9ms p99=56.7ms err=0.00%
+[20:48:00]   nível vus=16
+vus=16 reqs=1770 ok/s=29.5 p50=30.2ms p95=53.6ms p99=71.4ms err=0.00%
+[20:49:20]   nível vus=32
+vus=32 reqs=3398 ok/s=56.6 p50=51.2ms p95=126.0ms p99=180.4ms err=0.00%
+[20:50:40]   nível vus=64
+vus=64 reqs=4414 ok/s=73.6 p50=351.0ms p95=590.9ms p99=707.3ms err=0.00%
+[20:52:02]   nível vus=128
+vus=128 reqs=4402 ok/s=73.4 p50=1208.4ms p95=1783.0ms p99=2089.2ms err=0.00%
+[20:53:23] fim. resultados em experiments/results/vbox-cpu

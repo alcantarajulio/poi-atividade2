@@ -1,0 +1,27 @@
+{
+  "base_url": "http://localhost:8081",
+  "target_path": "/cpu?iter=120000",
+  "vus": 64,
+  "think_time_s": 0.5,
+  "duration_s": 60,
+  "warmup_s": 10,
+  "requests": 2397,
+  "requests_ok": 2397,
+  "requests_tail": 0,
+  "rps": 39.95,
+  "rps_ok": 39.95,
+  "error_rate": 0,
+  "run_start_epoch": 1792018322.4224944,
+  "run_end_epoch": 1792018395.32,
+  "measure_start_epoch": 1792018332.4224944,
+  "measure_end_epoch": 1792018392.4224944,
+  "latency_ms": {
+    "avg": 1114.0741876608279,
+    "min": 49.006873,
+    "p50": 885.414048,
+    "p90": 1682.2447382,
+    "p95": 1742.1461718,
+    "p99": 1843.56633212,
+    "max": 2650.535428
+  }
+}

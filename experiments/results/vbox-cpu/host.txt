@@ -1,0 +1,7 @@
+Linux fedora 7.2.9-101.fc43.x86_64 #1 SMP PREEMPT_DYNAMIC Fri Oct  9 16:34:47 UTC 2026 x86_64 GNU/Linux
+8
+CPU(s):                                  8
+Model name:                              11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+Thread(s) per core:                      2
+Core(s) per socket:                      4
+CPU(s) scaling MHz:                      59%

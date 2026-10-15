@@ -7,8 +7,11 @@ CONF=experiments/scenarios.conf
 source "$CONF"
 VM_SSH_PORT=${VM_SSH_PORT:-2222}
 VM_USER=${VM_USER:-osboxes}
-VDI_SRC=/local/uasc/images/ubuntu_server_2204_poi.vdi
-VDI=/tmp/ubuntu_server_2204_poi.vdi
+# O roteiro escreve "ubuntu_serve_2204_poi.vdi" e o projeto escrevia "ubuntu_server_...":
+# aceitamos as duas grafias. Em casa, use VDI_DIR=~/VMs/discos (ou onde estiver o arquivo).
+VDI_NAMES=(ubuntu_serve_2204_poi.vdi ubuntu_server_2204_poi.vdi)
+VDI_SRC_DIR=${VDI_SRC_DIR:-/local/uasc/images}
+VDI_DIR=${VDI_DIR:-/tmp}
 TARGET_MS=${TARGET_MS:-25}
 if [ "$(uname -s)-$(uname -m)" = Linux-x86_64 ]; then
   export PATH="$ROOT/tools/linux-amd64:$HOME/bin:$PATH"
@@ -26,6 +29,24 @@ fail() { printf '  FALHOU  %s\n' "$*" >&2; exit 1; }
 
 vm_exists() { VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; }
 vm_state() { VBoxManage showvminfo "$VM_NAME" --machinereadable | sed -n 's/^VMState="\(.*\)"/\1/p'; }
+
+# Primeiro .vdi que existe em um diretório, tentando as duas grafias do nome.
+find_vdi() {
+  local dir=$1 n
+  for n in "${VDI_NAMES[@]}"; do
+    if [ -f "$dir/$n" ]; then
+      echo "$dir/$n"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Caminho do disco que a VM realmente usa (lido do próprio VirtualBox).
+vm_disk() {
+  VBoxManage showvminfo "$VM_NAME" --machinereadable 2>/dev/null \
+    | sed -n 's/^"[^"]*-[0-9]*-[0-9]*"="\(.*\.vdi\)"$/\1/p' | head -1
+}
 
 wait_ready() {
   local url=$1 secs=${2:-300}
@@ -77,17 +98,19 @@ cmd_preflight() {
   df -h /tmp | tail -1 | awk '{print "  ok      /tmp com " $4 " livres"}'
 
   step "disco e VM"
-  if [ -f "$VDI" ]; then
-    ok "$VDI já está em /tmp"
-  elif [ -f "$VDI_SRC" ]; then
-    ok "$VDI_SRC ($(du -h "$VDI_SRC" | cut -f1)); copie para /tmp antes de criar a VM"
-  else
-    fail "VDI não encontrado em $VDI_SRC nem em $VDI"
-  fi
   if vm_exists; then
     ok "VM $VM_NAME registrada (estado: $(vm_state))"
+    ok "disco da VM: $(vm_disk)"
   else
     warn "VM $VM_NAME ainda não existe: criem pela interface do VirtualBox com esse nome"
+    local found
+    if found=$(find_vdi "$VDI_DIR"); then
+      ok "$found já está em $VDI_DIR"
+    elif found=$(find_vdi "$VDI_SRC_DIR"); then
+      ok "$found ($(du -h "$found" | cut -f1)); copie para /tmp antes de criar a VM"
+    else
+      fail "VDI (${VDI_NAMES[*]}) não encontrado em $VDI_DIR nem em $VDI_SRC_DIR. Confira o nome com ls e use VDI_DIR=... se ele estiver em outra pasta"
+    fi
   fi
 }
 
@@ -95,10 +118,10 @@ cmd_ssh() {
   step "acesso ssh por chave"
   echo "  esperando o sshd da VM na porta $VM_SSH_PORT..."
   for _ in $(seq 120); do
-    ssh-keyscan -p "$VM_SSH_PORT" localhost >/dev/null 2>&1 && break
+    ssh-keyscan -4 -p "$VM_SSH_PORT" localhost >/dev/null 2>&1 && break
     sleep 2
   done
-  ssh-keyscan -p "$VM_SSH_PORT" localhost >/dev/null 2>&1 || fail "nada respondendo na porta $VM_SSH_PORT (openssh-server instalado? regra ssh criada?)"
+  ssh-keyscan -4 -p "$VM_SSH_PORT" localhost >/dev/null 2>&1 || fail "nada respondendo na porta $VM_SSH_PORT (openssh-server instalado? regra ssh criada?)"
   if ssh_vm true 2>/dev/null; then
     ok "a chave já funciona"
   else
@@ -141,12 +164,18 @@ cmd_calibrate() {
   set_conf_line "TARGET_PATH=" "TARGET_PATH='/cpu?iter=$iter'"
   ok "$(grep '^TARGET_PATH=' "$CONF")"
 
-  local cores s4=4
+  # O S4 deixa pelo menos um núcleo físico livre para o k6 e o sistema, e nunca repete outro
+  # cenário: S3 já é 2 vCPUs e 2048 MB, então em hosts pequenos o S4 usa 1 vCPU e 2048 MB.
+  local cores s4
   cores=$(physical_cores)
-  if [ "$cores" -le 4 ]; then
-    s4=$((cores - 1))
+  if [ "$cores" -ge 5 ]; then
+    s4=4
+  elif [ "$cores" -eq 4 ]; then
+    s4=3
+  else
+    s4=1
+    warn "host com só $cores núcleos físicos: S4 = 1 vCPU e 2048 MB (diferente do S1 só na memória)"
   fi
-  [ "$s4" -lt 2 ] && s4=2
   set_conf_line "SCENARIOS=" "SCENARIOS=(\"S1 1 1024\" \"S2 2 1024\" \"S3 2 2048\" \"S4 $s4 2048\")"
   ok "$(grep '^SCENARIOS=' "$CONF")  (host com $cores núcleos físicos)"
   curl -sf "localhost:$APP_PORT/cpu?iter=$iter" | sed 's/^/          conferência: /'
@@ -173,6 +202,16 @@ cmd_smoke() {
   rm -rf "$dir"
   RESULTS_DIR=$dir ONLY=S1 LEVELS_ONLY=4 DURATION=20s WARMUP=5s experiments/run.sh "$CONF"
   local l="$dir/S1/vus-004"
+  if grep -q '"measure_start_epoch": *[0-9]' "$l/k6.json" 2>/dev/null; then
+    ok "k6.json traz a janela de medição (measure_start_epoch)"
+  else
+    fail "k6.json sem measure_start_epoch: o analisador não conseguiria alinhar os coletores"
+  fi
+  if grep -q '"requests_tail": 0,' "$l/k6.json" 2>/dev/null; then
+    ok "nenhuma requisição emitida depois do fim da janela"
+  else
+    warn "há requisições na fase tail em $l/k6.json; confira o load.js"
+  fi
   for f in k6.json metrics.csv vmstat.txt host-proc.csv host-vbox.csv; do
     if [ -s "$l/$f" ] && [ "$(wc -l < "$l/$f")" -gt 1 ]; then
       ok "$f ($(wc -l < "$l/$f" | tr -d ' ') linhas)"
@@ -202,8 +241,13 @@ cmd_pack() {
   out="$HOME/poi-resultados-$(date +%Y%m%d-%H%M).tar.gz"
   tar -czf "$out" experiments/results experiments/*.log "$CONF" 2>/dev/null || tar -czf "$out" experiments/results "$CONF"
   ok "$out ($(du -h "$out" | cut -f1)) -> Drive, junto com o VDI"
-  if [ -f "$VDI" ]; then
-    ok "VDI: $VDI ($(du -h "$VDI" | cut -f1)). Desligue a VM antes de copiar."
+  local disk=""
+  vm_exists && disk=$(vm_disk)
+  [ -n "$disk" ] || disk=$(find_vdi "$VDI_DIR") || disk=""
+  if [ -n "$disk" ] && [ -f "$disk" ]; then
+    ok "VDI: $disk ($(du -h "$disk" | cut -f1)). Desligue a VM antes de copiar."
+  else
+    warn "não achei o VDI da VM; confira o caminho em Configurações > Armazenamento"
   fi
 }
 

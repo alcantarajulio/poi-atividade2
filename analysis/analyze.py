@@ -7,9 +7,18 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 USAGE = "uso: analyze.py <pasta_de_resultados> [pasta_de_saida]"
+
+# Avisos coletados durante a leitura (níveis faltando, janela estimada etc.).
+# Vão para o stderr e para o topo do summary.md.
+WARNINGS = []
+
+def warn(msg):
+    WARNINGS.append(msg)
+    print(f"ATENÇÃO: {msg}", file=sys.stderr)
 
 SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"]
 SURFACE = "#fcfcfb"
@@ -27,39 +36,99 @@ def read_env(path):
             out[k] = v
     return out
 
-def window(df, ts_col, warmup, duration):
+def read_env_float(meta, key):
+    try:
+        return float(meta.get(key, ""))
+    except ValueError:
+        return None
+
+def measure_window(k6, ldir):
+    """Janela de medição em epoch (t0, t1) e de onde ela veio.
+
+    Preferência: o que o próprio k6 gravou (measure_start_epoch). Reserva: o horário em que
+    o run.sh lançou o k6, mais o aquecimento. Sem nenhum dos dois (resultados antigos), None:
+    a janela é estimada pela primeira amostra de cada coletor, que pode desalinhar os
+    coletores em alguns segundos.
+    """
+    t0, t1 = k6.get("measure_start_epoch"), k6.get("measure_end_epoch")
+    if t0 is not None and t1 is not None:
+        return (float(t0), float(t1)), "k6"
+    run_env = ldir / "run.env"
+    if run_env.exists():
+        launch = read_env_float(read_env(run_env), "k6_launch_epoch")
+        if launch is not None:
+            t0 = launch + k6["warmup_s"]
+            return (t0, t0 + k6["duration_s"]), "launch"
+    return None, "legacy"
+
+def window(df, ts_col, warmup, duration, win=None):
     if df.empty:
         return df
+    if win is not None:
+        return df[(df[ts_col] >= win[0]) & (df[ts_col] <= win[1])]
     t0 = df[ts_col].min()
     return df[(df[ts_col] >= t0 + warmup) & (df[ts_col] <= t0 + warmup + duration)]
 
-def rate(df, ts_col, col):
+def span(ts, win):
+    """Trecho da janela [t0, t1] coberto pelas amostras. Se os coletores pararam um pouco antes
+    do fim da janela (ou começaram um pouco depois), usa só o trecho coberto, desde que seja
+    pelo menos 80% da janela. Devolve None quando a cobertura é pior que isso."""
+    a, b = max(win[0], ts.iloc[0]), min(win[1], ts.iloc[-1])
+    if b - a < 0.8 * (win[1] - win[0]):
+        return None
+    return a, b
+
+def rate(df, ts_col, col, win=None):
+    """Taxa de um contador. Com janela absoluta, interpola o contador nas pontas do trecho
+    coberto (sem erro de quantização das amostras); sem ela, usa a primeira e a última
+    amostra recebidas."""
+    if win is not None:
+        d = df.sort_values(ts_col)
+        if len(d) < 2:
+            return float("nan")
+        sp = span(d[ts_col], win)
+        if sp is None:
+            return float("nan")
+        v0, v1 = np.interp(list(sp), d[ts_col], d[col])
+        return (v1 - v0) / (sp[1] - sp[0])
     if len(df) < 2:
         return float("nan")
     df = df.sort_values(ts_col)
     dt = df[ts_col].iloc[-1] - df[ts_col].iloc[0]
     return (df[col].iloc[-1] - df[col].iloc[0]) / dt if dt > 0 else float("nan")
 
-def app_metrics(path, warmup, duration):
+def app_metrics(path, warmup, duration, win=None):
     if not path.exists():
         return {}
-    df = pd.read_csv(path)
-    df = window(df, "ts", warmup, duration)
+    full = pd.read_csv(path)
+    df = window(full, "ts", warmup, duration, win)
     if df.empty:
         return {}
 
-    def series(name):
-        s = df[df["series"] == name][["ts", "value"]]
+    def series(name, src=df):
+        s = src[src["series"] == name][["ts", "value"]]
         return s.groupby("ts", as_index=False)["value"].sum()
 
-    def prefixed(prefix):
-        s = df[df["series"].str.startswith(prefix)][["ts", "value"]]
+    def prefixed(prefix, src=df):
+        s = src[src["series"].str.startswith(prefix)][["ts", "value"]]
         return s.groupby("ts", as_index=False)["value"].sum()
+
+    def delta(s):
+        """Variação de um contador na janela (interpolada quando há janela absoluta)."""
+        if win is not None:
+            if len(s) < 2:
+                return float("nan")
+            sp = span(s["ts"], win)
+            if sp is None:
+                return float("nan")
+            v0, v1 = np.interp(list(sp), s["ts"], s["value"])
+            return v1 - v0
+        return s["value"].iloc[-1] - s["value"].iloc[0]
 
     out = {}
-    cpu = series("process_cpu_seconds_total")
+    cpu = series("process_cpu_seconds_total", full if win is not None else df)
     if not cpu.empty:
-        out["app_cpu_cores"] = rate(cpu, "ts", "value")
+        out["app_cpu_cores"] = rate(cpu, "ts", "value", win)
     rss = series("process_resident_memory_bytes")
     if not rss.empty:
         out["app_rss_mb"] = rss["value"].mean() / 2**20
@@ -70,23 +139,24 @@ def app_metrics(path, warmup, duration):
     inflight = series("http_requests_in_flight")
     if not inflight.empty:
         out["app_in_flight"] = inflight["value"].mean()
-    dsum = prefixed("http_request_duration_seconds_sum")
-    dcount = prefixed("http_request_duration_seconds_count")
+    src = full if win is not None else df
+    dsum = prefixed("http_request_duration_seconds_sum", src)
+    dcount = prefixed("http_request_duration_seconds_count", src)
     if len(dsum) >= 2 and len(dcount) >= 2:
-        n = dcount["value"].iloc[-1] - dcount["value"].iloc[0]
-        s = dsum["value"].iloc[-1] - dsum["value"].iloc[0]
-        if n > 0:
+        n = delta(dcount)
+        s = delta(dsum)
+        if pd.notna(n) and n > 0:
             out["server_latency_avg_ms"] = s / n * 1000
     return out
 
-def cgroup_metrics(path, warmup, duration, cpus):
+def cgroup_metrics(path, warmup, duration, cpus, win=None):
     if not path.exists():
         return {}
-    df = pd.read_csv(path).dropna()
-    df = window(df, "ts", warmup, duration)
+    full = pd.read_csv(path).dropna()
+    df = window(full, "ts", warmup, duration, win)
     if len(df) < 2:
         return {}
-    cores = rate(df, "ts", "cpu_usage_usec") / 1e6
+    cores = rate(full if win is not None else df, "ts", "cpu_usage_usec", win) / 1e6
     return {
         "cpu_cores": cores,
         "cpu_pct": cores / cpus * 100,
@@ -103,16 +173,49 @@ def guest_mem_total_mb(scenario_dir):
             return float(line.split()[1])
     return float("nan")
 
-def vmstat_metrics(path, warmup, duration, mem_total_mb):
+def tz_hours(label):
+    """Deslocamento em horas do rótulo de fuso que o vmstat imprime (UTC, -03, +0530...)."""
+    if label in ("UTC", "GMT"):
+        return 0.0
+    m = re.fullmatch(r"([+-])(\d{2})(\d{2})?", label)
+    if not m:
+        return None
+    sign = -1.0 if m.group(1) == "-" else 1.0
+    return sign * (int(m.group(2)) + int(m.group(3) or 0) / 60)
+
+def vmstat_metrics(path, warmup, duration, mem_total_mb, win=None, clock_offset=0.0):
+    """Lê a saída de `vmstat -n -t 1`. A primeira linha de dados é a média desde o boot e é
+    descartada. Com janela absoluta, cada linha é posicionada pelo seu carimbo de hora (do
+    relógio do convidado, corrigido pelo desvio medido contra o hospedeiro); sem ele (ou se o
+    fuso do vmstat não for UTC), cai para a contagem de linhas a partir do início."""
     if not path.exists():
         return {}
     lines = path.read_text().splitlines()
     if len(lines) < 4:
         return {}
-    names = lines[1].split()[:-1]
-    rows = [ln.split()[: len(names)] for ln in lines[3:] if ln.strip()]
-    df = pd.DataFrame(rows, columns=names).apply(pd.to_numeric, errors="coerce").dropna()
-    df = df.iloc[int(warmup) : int(warmup + duration)]
+    header = lines[1].split()
+    tz_label = header[-1]
+    names = header[:-1]
+    n = len(names)
+    rows, stamps = [], []
+    for ln in lines[3:]:
+        tok = ln.split()
+        if len(tok) < n:
+            continue
+        rows.append(tok[:n])
+        stamps.append(" ".join(tok[n : n + 2]))
+    df = pd.DataFrame(rows, columns=names).apply(pd.to_numeric, errors="coerce")
+    tz_h = tz_hours(tz_label)
+    use_time = win is not None and tz_h is not None
+    if use_time:
+        ts = pd.to_datetime(pd.Series(stamps), format="%Y-%m-%d %H:%M:%S", errors="coerce", utc=True)
+        epoch = (ts - pd.Timestamp("1970-01-01", tz="UTC")).dt.total_seconds()
+        df["ts"] = (epoch - tz_h * 3600 - clock_offset).to_numpy()
+    df = df.dropna()
+    if use_time:
+        df = df[(df["ts"] >= win[0]) & (df["ts"] <= win[1])]
+    else:
+        df = df.iloc[int(warmup) : int(warmup + duration)]
     if df.empty:
         return {}
     used_kb = mem_total_mb * 1024 - df["free"] - df["buff"] - df["cache"]
@@ -130,20 +233,21 @@ def vmstat_metrics(path, warmup, duration, mem_total_mb):
         "swap_out_kbs": df["so"].mean(),
     }
 
-def host_metrics(level_dir, warmup, duration, cpus):
+def host_metrics(level_dir, warmup, duration, cpus, win=None):
     out = {}
     proc = level_dir / "host-proc.csv"
     if proc.exists():
-        df = window(pd.read_csv(proc), "ts", warmup, duration)
+        full = pd.read_csv(proc)
+        df = window(full, "ts", warmup, duration, win)
         if len(df) >= 2:
             clk = df["clk_tck"].iloc[0]
-            cores = rate(df, "ts", "cpu_ticks") / clk
+            cores = rate(full if win is not None else df, "ts", "cpu_ticks", win) / clk
             out["host_vm_cpu_cores"] = cores
             out["host_vm_cpu_pct"] = cores / cpus * 100
             out["host_vm_rss_mb"] = df["rss_kb"].mean() / 1024
     vb = level_dir / "host-vbox.csv"
     if vb.exists():
-        df = window(pd.read_csv(vb), "ts", warmup, duration)
+        df = window(pd.read_csv(vb), "ts", warmup, duration, win)
         df = df[pd.to_numeric(df["value"], errors="coerce").notna()]
         for metric, g in df.groupby("metric"):
             key = "vbox_" + re.sub(r"[^A-Za-z0-9]+", "_", metric).strip("_").lower()
@@ -161,13 +265,22 @@ def load(results):
         meta = read_env(sdir / "scenario.env")
         cpus = float(meta["cpus"])
         mem_total = guest_mem_total_mb(sdir)
+        offset = read_env_float(meta, "clock_offset_s") or 0.0
+        if abs(offset) > 1.0:
+            warn(f"{meta['scenario']}: relógio do convidado difere {offset:+.2f} s do hospedeiro (corrigido na análise)")
+        found = set()
+        failed = []
         for ldir in sorted(sdir.glob("vus-*")):
             k6p = ldir / "k6.json"
             if not k6p.exists():
+                if (ldir / "FAILED").exists():
+                    failed.append(int(ldir.name.split("-")[1]))
                 continue
             k6 = json.loads(k6p.read_text())
+            found.add(int(k6["vus"]))
             warmup = k6.get("warmup_s", parse_seconds(meta["warmup"]))
             duration = k6["duration_s"]
+            win, win_src = measure_window(k6, ldir)
             lat = {k: (float("nan") if v is None else v) for k, v in k6["latency_ms"].items()}
             row = {
                 "scenario": meta["scenario"],
@@ -184,15 +297,33 @@ def load(results):
                 "lat_p99_ms": lat["p99"],
                 "error_rate": k6["error_rate"],
                 "requests": k6["requests"],
+                "window_src": win_src,
             }
-            row.update(app_metrics(ldir / "metrics.csv", warmup, duration))
-            row.update(cgroup_metrics(ldir / "cgroup.csv", warmup, duration, cpus))
-            row.update(vmstat_metrics(ldir / "vmstat.txt", warmup, duration, mem_total))
-            row.update(host_metrics(ldir, warmup, duration, cpus))
+            if k6.get("requests_tail", 0):
+                warn(f"{meta['scenario']} vus={k6['vus']}: {k6['requests_tail']} requisições emitidas depois do fim da janela")
+            row.update(app_metrics(ldir / "metrics.csv", warmup, duration, win))
+            row.update(cgroup_metrics(ldir / "cgroup.csv", warmup, duration, cpus, win))
+            row.update(vmstat_metrics(ldir / "vmstat.txt", warmup, duration, mem_total, win, offset))
+            row.update(host_metrics(ldir, warmup, duration, cpus, win))
             if pd.notna(row.get("app_cpu_cores")) and row["rps"] > 0:
                 row["cpu_per_req_ms"] = row["app_cpu_cores"] / row["rps"] * 1000
             rows.append(row)
-    return pd.DataFrame(rows).sort_values(["scenario", "vus"]).reset_index(drop=True)
+        expected = sorted(int(v) for v in meta.get("levels", "").split())
+        missing = [v for v in expected if v not in found]
+        if missing or failed:
+            detail = f" (run.sh marcou falha em {sorted(failed)})" if failed else ""
+            warn(f"{meta['scenario']}: níveis sem resultado válido: {missing or sorted(failed)}{detail}; faltam nos gráficos")
+    df = pd.DataFrame(rows)
+    if df.empty:
+        return df
+    df = df.sort_values(["scenario", "vus"]).reset_index(drop=True)
+    legacy = int((df["window_src"] == "legacy").sum())
+    if legacy:
+        warn(f"{legacy} ponto(s) sem janela gravada pelo k6/run.sh: janela estimada pela primeira amostra de cada coletor (pode desalinhar alguns segundos)")
+    if (df["error_rate"] > 0.01).any():
+        bad = df[df["error_rate"] > 0.01][["scenario", "vus"]].apply(lambda r: f"{r['scenario']}/{int(r['vus'])}", axis=1).tolist()
+        warn(f"erro > 1% em: {', '.join(bad)}. Latência e vazão consideram só respostas 200")
+    return df
 
 def style():
     plt.rcParams.update(
@@ -330,23 +461,35 @@ def plots(df, out):
 
 
 def capacity(df):
+    """Capacidade por cenário.
+
+    O modelo de previsão (X_max = vCPUs / demanda de CPU por requisição, e N* = X_max (D + Z))
+    só faz sentido para a aplicação CPU-bound. Para memória e I/O o gargalo não é a CPU, então
+    as colunas previstas ficam vazias: só entram os valores observados (vazão máxima e joelho
+    da latência).
+    """
     rows = []
+    nan = float("nan")
     for s, d in df.groupby("scenario"):
         d = d.sort_values("vus")
         first = d.iloc[0]
-        if "cpu_per_req_ms" in d and d["cpu_per_req_ms"].notna().any():
-            demand = d["cpu_per_req_ms"].median()
-        else:
-            demand = first["lat_p50_ms"]
         z = first["think_time_s"]
         cpus = first["cpus"]
-        x_max = cpus / (demand / 1000)
         best = d.loc[d["rps"].idxmax()]
         base = first["lat_p95_ms"]
         knee = d[d["lat_p95_ms"] > 2 * base]
+        demand = x_max = n_star = nan
+        if first["app"] == "cpu":
+            if "cpu_per_req_ms" in d and d["cpu_per_req_ms"].notna().any():
+                demand = d["cpu_per_req_ms"].median()
+            else:
+                demand = first["lat_p50_ms"]
+            x_max = cpus / (demand / 1000)
+            n_star = x_max * (demand / 1000 + z)
         rows.append(
             {
                 "scenario": s,
+                "app": first["app"],
                 "cpus": cpus,
                 "mem_mb": first["mem_mb"],
                 "think_time_s": z,
@@ -354,7 +497,7 @@ def capacity(df):
                 "x_max_pred": x_max,
                 "x_max_obs": best["rps"],
                 "vus_at_max": best["vus"],
-                "n_star_pred": x_max * (demand / 1000 + z),
+                "n_star_pred": n_star,
                 "knee_vus": knee["vus"].iloc[0] if not knee.empty else None,
             }
         )
@@ -372,7 +515,17 @@ def write_tables(df, out):
     ]
     cap = capacity(df)
     with open(out / "summary.md", "w") as f:
+        if WARNINGS:
+            f.write("## Avisos\n\n")
+            for w in WARNINGS:
+                f.write(f"- {w}\n")
+            f.write("\n")
         f.write("## Capacidade por cenário\n\n")
+        if (df["app"] != "cpu").any():
+            f.write(
+                "Previsão (`demand_ms`, `x_max_pred`, `n_star_pred`) só existe para a aplicação "
+                "CPU-bound; para memória e I/O ficam vazias porque o modelo assume que a CPU é o gargalo.\n\n"
+            )
         f.write(cap.to_markdown(index=False, floatfmt=".1f"))
         f.write("\n\n## Todos os níveis\n\n")
         f.write(df[cols].to_markdown(index=False, floatfmt=".1f"))

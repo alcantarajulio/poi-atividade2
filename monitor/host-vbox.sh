@@ -10,7 +10,7 @@ clk=$(getconf CLK_TCK)
 echo "ts,metric,value,unit" > "$prefix-vbox.csv"
 echo "ts,cpu_ticks,rss_kb,clk_tck" > "$prefix-proc.csv"
 while true; do
-  ts=$(date +%s)
+  ts=$(date +%s.%N)
   VBoxManage metrics query "$vm" 2>/dev/null | \
     awk -v ts="$ts" 'NR > 2 && NF >= 3 { v=$3; u=$4; if (v ~ /%$/) { sub(/%$/, "", v); u="%" } print ts "," $2 "," v "," u }' \
     >> "$prefix-vbox.csv"

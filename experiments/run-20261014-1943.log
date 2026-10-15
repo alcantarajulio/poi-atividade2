@@ -1,0 +1,90 @@
+[19:43:25] configuração: experiments/scenarios.conf | backend: vbox | alvo: http://localhost:8081/cpu?iter=120000
+[19:43:25] cenário S1: 1 vCPU, 1024 MB
+[19:43:25] desligando poi-vm (ACPI)
+Waiting for VM "poi-vm" to power on...
+VM "poi-vm" has been successfully started.
+[19:43:51]   convidado confere: 1 vCPU(s), 971 MB
+[19:43:51]   aguardando 15s para o sistema estabilizar
+[19:44:07]   nível vus=1
+vus=1 reqs=121 ok/s=2.0 p50=30.4ms p95=32.1ms p99=35.9ms err=0.00%
+[19:45:25]   nível vus=2
+vus=2 reqs=242 ok/s=4.0 p50=30.2ms p95=55.2ms p99=59.1ms err=0.00%
+[19:46:44]   nível vus=4
+vus=4 reqs=481 ok/s=8.0 p50=29.9ms p95=56.6ms p99=62.9ms err=0.00%
+[19:48:03]   nível vus=8
+vus=8 reqs=922 ok/s=15.4 p50=31.0ms p95=75.3ms p99=98.9ms err=0.00%
+[19:49:22]   nível vus=16
+vus=16 reqs=1713 ok/s=28.6 p50=54.7ms p95=142.9ms p99=190.0ms err=0.00%
+[19:50:42]   nível vus=32
+vus=32 reqs=2398 ok/s=40.0 p50=258.5ms p95=564.0ms p99=669.5ms err=0.00%
+[19:52:02]   nível vus=64
+vus=64 reqs=2397 ok/s=40.0 p50=885.4ms p95=1742.1ms p99=1843.6ms err=0.00%
+[19:53:23]   nível vus=128
+vus=128 reqs=2416 ok/s=40.3 p50=2030.7ms p95=4031.5ms p99=4122.4ms err=0.00%
+[19:54:46] cenário S2: 2 vCPU, 1024 MB
+[19:54:46] desligando poi-vm (ACPI)
+Waiting for VM "poi-vm" to power on...
+VM "poi-vm" has been successfully started.
+[19:55:07]   convidado confere: 2 vCPU(s), 971 MB
+[19:55:07]   aguardando 15s para o sistema estabilizar
+[19:55:23]   nível vus=1
+vus=1 reqs=101 ok/s=1.7 p50=30.5ms p95=33.0ms p99=39.3ms err=0.00%
+[19:56:42]   nível vus=2
+vus=2 reqs=238 ok/s=4.0 p50=30.7ms p95=33.3ms p99=35.6ms err=0.00%
+[19:58:01]   nível vus=4
+vus=4 reqs=441 ok/s=7.3 p50=30.1ms p95=34.9ms p99=44.8ms err=0.00%
+[19:59:20]   nível vus=8
+vus=8 reqs=873 ok/s=14.6 p50=35.0ms p95=84.3ms p99=122.2ms err=0.00%
+[20:00:39]   nível vus=16
+vus=16 reqs=1600 ok/s=26.7 p50=67.0ms p95=168.4ms p99=216.6ms err=0.00%
+[20:01:59]   nível vus=32
+vus=32 reqs=2285 ok/s=38.1 p50=327.1ms p95=554.1ms p99=676.5ms err=0.00%
+[20:03:20]   nível vus=64
+vus=64 reqs=2221 ok/s=37.0 p50=1185.7ms p95=1738.1ms p99=2038.0ms err=0.00%
+[20:04:41]   nível vus=128
+vus=128 reqs=3199 ok/s=53.3 p50=1628.9ms p95=3632.5ms p99=4489.5ms err=0.00%
+[20:06:06] cenário S3: 2 vCPU, 2048 MB
+[20:06:07] desligando poi-vm (ACPI)
+Waiting for VM "poi-vm" to power on...
+VM "poi-vm" has been successfully started.
+[20:06:58]   convidado confere: 2 vCPU(s), 1977 MB
+[20:06:58]   aguardando 15s para o sistema estabilizar
+[20:07:14]   nível vus=1
+vus=1 reqs=110 ok/s=1.8 p50=31.1ms p95=34.3ms p99=35.5ms err=0.00%
+[20:08:36]   nível vus=2
+vus=2 reqs=215 ok/s=3.6 p50=30.8ms p95=34.1ms p99=41.6ms err=0.00%
+[20:09:55]   nível vus=4
+vus=4 reqs=452 ok/s=7.5 p50=30.5ms p95=37.2ms p99=43.1ms err=0.00%
+[20:11:15]   nível vus=8
+vus=8 reqs=869 ok/s=14.5 p50=30.3ms p95=43.6ms p99=54.9ms err=0.00%
+[20:12:35]   nível vus=16
+vus=16 reqs=1744 ok/s=29.1 p50=30.5ms p95=56.5ms p99=75.6ms err=0.00%
+[20:13:55]   nível vus=32
+vus=32 reqs=3399 ok/s=56.6 p50=51.5ms p95=127.9ms p99=176.3ms err=0.00%
+[20:15:15]   nível vus=64
+vus=64 reqs=4353 ok/s=72.5 p50=364.2ms p95=613.1ms p99=732.5ms err=0.00%
+[20:16:35]   nível vus=128
+vus=128 reqs=4267 ok/s=71.1 p50=1287.3ms p95=1928.0ms p99=2353.6ms err=0.00%
+[20:17:58] cenário S4: 3 vCPU, 2048 MB
+[20:17:58] desligando poi-vm (ACPI)
+Waiting for VM "poi-vm" to power on...
+VM "poi-vm" has been successfully started.
+[20:18:20]   convidado confere: 3 vCPU(s), 1977 MB
+[20:18:20]   aguardando 15s para o sistema estabilizar
+[20:18:36]   nível vus=1
+vus=1 reqs=131 ok/s=2.2 p50=30.8ms p95=34.2ms p99=38.9ms err=0.00%
+[20:19:55]   nível vus=2
+vus=2 reqs=223 ok/s=3.7 p50=31.0ms p95=33.5ms p99=38.1ms err=0.00%
+[20:21:15]   nível vus=4
+vus=4 reqs=460 ok/s=7.7 p50=30.5ms p95=36.4ms p99=40.1ms err=0.00%
+[20:22:35]   nível vus=8
+vus=8 reqs=881 ok/s=14.7 p50=30.0ms p95=38.1ms p99=47.7ms err=0.00%
+[20:23:54]   nível vus=16
+vus=16 reqs=1841 ok/s=30.7 p50=30.1ms p95=50.1ms p99=88.7ms err=0.00%
+[20:25:14]   nível vus=32
+vus=32 reqs=3550 ok/s=59.2 p50=30.6ms p95=67.3ms p99=101.4ms err=0.00%
+[20:26:35]   nível vus=64
+vus=64 reqs=5758 ok/s=96.0 p50=145.7ms p95=295.3ms p99=367.2ms err=0.00%
+[20:27:56]   nível vus=128
+vus=128 reqs=5726 ok/s=95.4 p50=819.7ms p95=1276.6ms p99=1533.1ms err=0.00%
+[20:29:17] fim. resultados em experiments/results/vbox-cpu
