@@ -30,6 +30,7 @@ for app in cpu mem io; do
     echo "[Service]"
     echo "StandardOutput=append:$MNT/logs/poi-$app.log"
     echo "StandardError=append:$MNT/logs/poi-$app.log"
+    echo "Environment=ACCESS_LOG=1"
     [ "$app" = io ] && echo "Environment=IO_DIR=$MNT/io"
   } > "$d/volume.conf"
 done

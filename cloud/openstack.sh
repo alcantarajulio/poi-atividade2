@@ -9,7 +9,7 @@ SG=sg-grupo-17
 VOL=vol-grupo-17
 LB=poi-atividades
 LB_ID=${LB_ID:-57c2b14a-b746-4f34-8719-d0627e409609}
-SNAP=snap-poi-grupo-17
+SNAP=${SNAP:-snap-poi-grupo-17}
 SSH_PORT=2217
 app_port() { case $1 in cpu) echo 8081;; mem) echo 8082;; io) echo 8083;; esac; }
 lb_port() { case $1 in cpu) echo 1701;; mem) echo 1702;; io) echo 1703;; esac; }

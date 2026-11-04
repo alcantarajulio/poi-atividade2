@@ -28,7 +28,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	withMetrics := middleware.Chain(middleware.Metrics)
+	mws := []func(http.HandlerFunc) http.HandlerFunc{middleware.Metrics}
+	if env.String("ACCESS_LOG", "") == "1" {
+		mws = append(mws, middleware.AccessLog)
+	}
+	withMetrics := middleware.Chain(mws...)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /io", withMetrics(handler.IO(cfg)))
