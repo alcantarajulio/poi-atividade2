@@ -8,3 +8,5 @@ __pycache__/
 /tools/
 experiments/results/smoke/
 /run.log
+
+cloud/*.pem
