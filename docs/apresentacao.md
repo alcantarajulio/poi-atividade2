@@ -1,10 +1,10 @@
 # Roteiro da demonstração (LCC)
 
-A demonstração leva uns três minutos. A Pessoa 2 conduz a parte da VM, e a Pessoa
-1, a das aplicações e dos resultados. Os dois precisam conseguir responder
-perguntas sobre qualquer parte.
+A demonstração leva uns três minutos, em três partes: a VM, as aplicações e o
+experimento. Qualquer integrante do grupo precisa conseguir responder perguntas
+sobre qualquer parte.
 
-## 1. A VM (Pessoa 2)
+## 1. A VM
 
 Mostrar a janela do VirtualBox com a `poi-vm` rodando e, nas Configurações, 1 vCPU
 e 1 GB, o VDI em `/tmp` e a tabela de redirecionamento de portas. Explicar que a VM
@@ -16,7 +16,7 @@ número de vCPUs, a memória e os três serviços systemd ativos dentro dela. Ex
 que os serviços sobem sozinhos no boot e reiniciam se a aplicação cair, e que por
 isso dá para religar a VM entre cenários sem intervenção.
 
-## 2. As aplicações (Pessoa 1)
+## 2. As aplicações
 
 Nas saídas seguintes do `demo`, as três apps respondem pelo host. O `/cpu` faz
 SHA-256 encadeado, e o tempo depende só da CPU. O `/mem` aloca e varre memória, e o
@@ -26,7 +26,7 @@ todo o tempo é espera pelo disco.
 Mostrar o `elapsed_ms` de cada uma e o trecho do `/metrics`, de onde saem a CPU e a
 memória do processo durante os testes.
 
-## 3. O experimento (Pessoa 1)
+## 3. O experimento
 
 Se houver tempo, mostrar o `docs/figuras/docker-cpu/vazao_vs_demanda.png` do ensaio
 local ou, se a varredura no LCC já tiver terminado, a mesma figura com os dados da

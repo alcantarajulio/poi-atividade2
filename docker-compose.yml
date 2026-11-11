@@ -1,0 +1,43 @@
+# Deploy das três apps na VM vm-poi-grupo-17 (Atividade 4).
+# Na VM: docker compose pull && docker compose up -d
+# As portas 9081-9083 do host ficam atrás dos listeners 1711-1713 do
+# balanceador poi-atividades (cloud/openstack.sh containers).
+name: poi
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+
+services:
+  cpu:
+    image: alcantara1julio/poi-cpu:1.0
+    restart: unless-stopped
+    ports:
+      - "9081:8080"
+    environment:
+      ACCESS_LOG: "1"
+    logging: *logging
+
+  mem:
+    image: alcantara1julio/poi-mem:1.0
+    restart: unless-stopped
+    ports:
+      - "9082:8080"
+    environment:
+      ACCESS_LOG: "1"
+    logging: *logging
+
+  io:
+    image: alcantara1julio/poi-io:1.0
+    restart: unless-stopped
+    ports:
+      - "9083:8080"
+    environment:
+      ACCESS_LOG: "1"
+      IO_DIR: /data
+    volumes:
+      # volume vol-grupo-17 (1 GB) montado em /mnt/dados desde a Atividade 3
+      - /mnt/dados/docker/io:/data
+    logging: *logging

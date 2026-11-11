@@ -13,6 +13,9 @@ SNAP=${SNAP:-snap-poi-grupo-17}
 SSH_PORT=2217
 app_port() { case $1 in cpu) echo 8081;; mem) echo 8082;; io) echo 8083;; esac; }
 lb_port() { case $1 in cpu) echo 1701;; mem) echo 1702;; io) echo 1703;; esac; }
+# Atividade 4: containers do docker-compose.yml
+docker_port() { case $1 in cpu) echo 9081;; mem) echo 9082;; io) echo 9083;; esac; }
+docker_lb_port() { case $1 in cpu) echo 1711;; mem) echo 1712;; io) echo 1713;; esac; }
 
 source "$VENV/bin/activate"
 export PYTHONWARNINGS=ignore
@@ -69,17 +72,34 @@ rede() {
   run security group rule list "$SG"
 }
 
-lb() {
+vm_rede() {
   VM_IP=$(openstack server show "$VM" -f json -c addresses | python3 -c 'import json,sys; a=json.load(sys.stdin)["addresses"]; print(next(iter(a.values()))[0])')
   NET=$(openstack server show "$VM" -f json -c addresses | python3 -c 'import json,sys; print(next(iter(json.load(sys.stdin)["addresses"])))')
   SUBNET=$(openstack subnet list --network "$NET" -f value -c ID | head -1)
   echo "VM $VM_IP na rede $NET (subnet $SUBNET)"
+}
+
+lb() {
+  vm_rede
   listener ssh-grupo-17 TCP "$SSH_PORT" 22
   for app in cpu mem io; do
     listener "app-$app-grupo-17" HTTP "$(lb_port $app)" "$(app_port $app)"
   done
   run loadbalancer listener list --loadbalancer "$LB_ID" -c name -c protocol -c protocol_port | grep -E 'grupo-17|protocol'
   run loadbalancer show "$LB_ID" -c name -c vip_address -c provisioning_status
+}
+
+containers() {
+  openstack security group rule list "$SG" -f value -c "Port Range" | grep -q '9081:9083' ||
+    run security group rule create --remote-ip 0.0.0.0/0 --protocol tcp --dst-port 9081:9083 "$SG"
+  vm_rede
+  for app in cpu mem io; do
+    listener "docker-$app-grupo-17" HTTP "$(docker_lb_port $app)" "$(docker_port $app)"
+  done
+  run loadbalancer listener list --loadbalancer "$LB_ID" -c name -c protocol -c protocol_port | grep -E 'grupo-17|protocol'
+  for app in cpu mem io; do
+    run loadbalancer member list "docker-$app-grupo-17-pool" -c name -c address -c protocol_port -c operating_status
+  done
 }
 
 volume() {
@@ -97,10 +117,10 @@ snapshot() {
   run image show "$SNAP" -c name -c status -c size
 }
 
-[ $# -eq 0 ] && { echo "uso: $0 listar|rede|lb|volume|snapshot ..." >&2; exit 2; }
+[ $# -eq 0 ] && { echo "uso: $0 listar|rede|lb|containers|volume|snapshot ..." >&2; exit 2; }
 for etapa in "$@"; do
   case "$etapa" in
-    listar|rede|lb|volume|snapshot) "$etapa" ;;
+    listar|rede|lb|containers|volume|snapshot) "$etapa" ;;
     *) echo "etapa desconhecida: $etapa" >&2; exit 2 ;;
   esac
 done

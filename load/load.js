@@ -20,10 +20,9 @@ function parseSeconds(d) {
 const WARMUP_S = parseSeconds(WARMUP);
 const DURATION_S = parseSeconds(DURATION);
 
-// Os mesmos VUs fazem o aquecimento e a medição, sem pausa entre os dois. Antes eram dois
-// cenários do k6: na virada, todos os VUs da medição disparavam juntos (rajada) enquanto o
-// servidor ainda processava as requisições interrompidas do aquecimento. Agora cada
-// requisição recebe a tag "phase" conforme o instante em que foi emitida:
+// Os mesmos VUs fazem o aquecimento e a medição, sem pausa entre os dois, para não haver
+// uma rajada de requisições na virada. Cada requisição recebe a tag "phase" conforme o
+// instante em que foi emitida:
 //   warmup  -> descartada
 //   measure -> conta (janela de DURATION segundos)
 //   tail    -> não deveria existir (nenhuma iteração começa depois do fim)

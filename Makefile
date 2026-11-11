@@ -2,8 +2,11 @@ APPS := cpu mem io
 LINUX_BIN := bin/linux-amd64
 K6_VERSION := v2.3.0
 K6_LINUX := tools/linux-amd64/k6
+DOCKERHUB_USER ?=
+TAG ?= 1.0
+PLATFORMS ?= linux/amd64,linux/arm64
 
-.PHONY: build build-linux lab-bundle test vet lint run-cpu run-mem run-io docker-build clean
+.PHONY: build build-linux lab-bundle test vet lint run-cpu run-mem run-io docker-build docker-push clean
 
 build:
 	@for app in $(APPS); do go build -o bin/$$app ./cmd/$$app || exit 1; done
@@ -44,6 +47,14 @@ run-io:
 
 docker-build:
 	@for app in $(APPS); do docker build --build-arg APP=$$app -t poi-$$app . || exit 1; done
+
+# make docker-push DOCKERHUB_USER=usuario (depois de docker login)
+docker-push:
+	@test -n "$(DOCKERHUB_USER)" || { echo "uso: make docker-push DOCKERHUB_USER=usuario" >&2; exit 1; }
+	@for app in $(APPS); do \
+		docker buildx build --platform $(PLATFORMS) --build-arg APP=$$app \
+			-t $(DOCKERHUB_USER)/poi-$$app:$(TAG) -t $(DOCKERHUB_USER)/poi-$$app:latest --push . || exit 1; \
+	done
 
 clean:
 	rm -rf bin tools poi-lab.tar.gz

@@ -1,13 +1,25 @@
-FROM golang:1.26-alpine AS build
+# Uma imagem por app: docker build --build-arg APP=cpu|mem|io -t poi-cpu .
+# O Go compila direto para a arquitetura alvo, então a imagem linux/amd64 da VM
+# sai de um Mac arm64 sem emulação.
+FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS build
 ARG APP=cpu
-WORKDIR /app
+ARG TARGETOS
+ARG TARGETARCH
+WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 go build -o /app-bin ./cmd/${APP}
+COPY cmd ./cmd
+COPY internal ./internal
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    go build -trimpath -ldflags="-s -w" -o /out/app ./cmd/${APP}
 
-FROM alpine:3.21
-COPY --from=build /app-bin /app
+FROM alpine:3.22
+ARG APP=cpu
+LABEL org.opencontainers.image.title="poi-${APP}"
+COPY --from=build /out/app /usr/local/bin/app
+USER 10001:10001
 ENV PORT=8080
 EXPOSE 8080
-ENTRYPOINT ["/app"]
+HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget -q -O /dev/null "http://127.0.0.1:${PORT}/livez" || exit 1
+ENTRYPOINT ["/usr/local/bin/app"]
