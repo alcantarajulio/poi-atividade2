@@ -7,8 +7,8 @@ CONF=experiments/scenarios.conf
 source "$CONF"
 VM_SSH_PORT=${VM_SSH_PORT:-2222}
 VM_USER=${VM_USER:-osboxes}
-# O roteiro escreve "ubuntu_serve_2204_poi.vdi" e o projeto escrevia "ubuntu_server_...":
-# aceitamos as duas grafias. Em casa, use VDI_DIR=~/VMs/discos (ou onde estiver o arquivo).
+# O roteiro escreve "ubuntu_serve_2204_poi.vdi" (sem o "r"), então aceitamos as duas grafias.
+# Em casa, use VDI_DIR=~/VMs/discos (ou onde estiver o arquivo).
 VDI_NAMES=(ubuntu_serve_2204_poi.vdi ubuntu_server_2204_poi.vdi)
 VDI_SRC_DIR=${VDI_SRC_DIR:-/local/uasc/images}
 VDI_DIR=${VDI_DIR:-/tmp}

@@ -1,6 +1,6 @@
 # Uma imagem por app: docker build --build-arg APP=cpu|mem|io -t poi-cpu .
-# O Go compila para a arquitetura alvo na plataforma do build, então gerar a
-# imagem linux/amd64 da VM num Mac arm64 não precisa de emulação.
+# O Go compila direto para a arquitetura alvo, então a imagem linux/amd64 da VM
+# sai de um Mac arm64 sem emulação.
 FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS build
 ARG APP=cpu
 ARG TARGETOS

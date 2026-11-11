@@ -110,10 +110,10 @@ outra pasta e `DRY_RUN=1` só imprime os comandos, sem executar nada.
 
 ## Containers e deploy com Docker Compose (nuvem do LSD)
 
-O `Dockerfile` gera uma imagem por app com `--build-arg APP=cpu|mem|io`. O binário
-é compilado na arquitetura do build e cruzado para a arquitetura alvo, então o Mac
-arm64 gera a imagem linux/amd64 da VM sem emulação. A imagem final é alpine, roda
-como o usuário 10001, escuta na porta 8080 e tem healthcheck em `/livez`.
+O `Dockerfile` gera uma imagem por app com `--build-arg APP=cpu|mem|io`. O Go
+compila direto para a arquitetura alvo, então a imagem linux/amd64 da VM sai de um
+Mac arm64 sem emulação. A imagem final usa alpine e o usuário 10001, escuta na porta
+8080 e tem healthcheck em `/livez`.
 
 ```bash
 docker login
