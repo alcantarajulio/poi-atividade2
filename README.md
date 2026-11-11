@@ -24,6 +24,8 @@ processo e heap do Go.
 | `internal/handler/` | handlers (`cpu.go`, `mem.go`, `io.go`, `health.go`) e testes |
 | `internal/middleware/` | métricas Prometheus por requisição |
 | `deploy/` | units systemd e scripts de deploy na VM |
+| `Dockerfile`, `docker-compose.yml` | imagem de cada app e deploy das três com Docker Compose |
+| `cloud/` | nuvem do LSD: OpenStack (rede, balanceador, volume, snapshot) e Docker na VM |
 | `load/load.js` | gerador de carga (k6) |
 | `monitor/` | coletores de métricas (app, SO convidado, hipervisor, cgroup) |
 | `experiments/` | configuração dos cenários, orquestrador e resultados brutos |
@@ -105,3 +107,34 @@ O `run.sh` também aceita variáveis de ambiente para rodar só uma parte da
 varredura: `ONLY="S1 S3"` escolhe os cenários, `LEVELS_ONLY="4 16"` escolhe os
 níveis, `DURATION` e `WARMUP` mudam a duração de cada nível, `RESULTS_DIR` grava em
 outra pasta e `DRY_RUN=1` só imprime os comandos, sem executar nada.
+
+## Containers e deploy com Docker Compose (nuvem do LSD)
+
+O `Dockerfile` gera uma imagem por app com `--build-arg APP=cpu|mem|io`. O binário
+é compilado na arquitetura do build e cruzado para a arquitetura alvo, então o Mac
+arm64 gera a imagem linux/amd64 da VM sem emulação. A imagem final é alpine, roda
+como o usuário 10001, escuta na porta 8080 e tem healthcheck em `/livez`.
+
+```bash
+docker login
+make docker-push DOCKERHUB_USER=usuario   # publica poi-cpu, poi-mem e poi-io (amd64 e arm64)
+```
+
+O `docker-compose.yml` sobe as três imagens do Docker Hub com `restart:
+unless-stopped`, log de acesso ligado e rotação de log. A app io grava no volume de
+1 GB da VM (`/mnt/dados/docker/io`).
+
+| App | Porta na VM | Listener no balanceador `poi-atividades` |
+|---|---|---|
+| cpu | 9081 | 1711 |
+| mem | 9082 | 1712 |
+| io | 9083 | 1713 |
+
+```bash
+cloud/docker-vm.sh deploy        # instala Docker e Compose na VM, copia o compose e sobe as apps
+cloud/openstack.sh containers    # libera 9081-9083 no sg-grupo-17 e cria os listeners 1711-1713
+cloud/docker-vm.sh evidencias    # containers, imagens, requisições pelo balanceador e logs
+```
+
+As apps instaladas com systemd na Atividade 3 continuam nas portas 8081 a 8083,
+atrás dos listeners 1701 a 1703.
